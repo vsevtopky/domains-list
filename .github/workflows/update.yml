@@ -2,15 +2,20 @@ name: Update Zapret List
 
 on:
   schedule:
-    - cron: '0 */12 * * *' # Обновление каждые 12 часов
-  workflow_dispatch: # Позволяет запускать вручную
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+# Включаем поддержку Node 24 для чистых логов
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   update-list:
     runs-on: ubuntu-latest
     steps:
+      # Обновили версию до v5, чтобы убрать предупреждение
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download fresh domains list
         run: |
