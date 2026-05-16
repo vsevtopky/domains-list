@@ -15,10 +15,10 @@ jobs:
       - name: Download fresh domains list
         run: |
           curl -sSL "https://p.thenewone.lol/domains-export.txt" -o domains-export.txt
-
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add domains-export.txt
+          git pull --rebase origin main
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update domains list" && git push)
