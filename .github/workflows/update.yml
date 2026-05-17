@@ -1,29 +1,39 @@
-name: Update Zapret List
+name: update zapret list
 
 on:
   schedule:
     - cron: '0 */12 * * *'
   workflow_dispatch:
 
-# Включаем поддержку Node 24 для чистых логов
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+# Даем права на запись в репозиторий
+permissions:
+  contents: write
 
 jobs:
   update-list:
     runs-on: ubuntu-latest
     steps:
-      # Обновили версию до v5, чтобы убрать предупреждение
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v5
 
-      - name: Download fresh domains list
+      - name: download fresh domains list
         run: |
           curl -sSL "https://p.thenewone.lol/domains-export.txt" -o domains-export.txt
-      - name: Commit and Push changes
+
+      - name: commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add domains-export.txt
-          git pull --rebase origin main
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update domains list" && git push)
+          
+          # Проверяем, есть ли изменения, чтобы не плодить пустые коммиты и ошибки
+          if ! git diff --cached --quiet; then
+            git commit -m "auto-update domains list"
+            git pull --rebase origin main || true
+            git push
+          else
+            echo "No changes detected"
+          fi
