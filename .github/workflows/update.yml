@@ -27,13 +27,17 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 1. Сначала стягиваем возможные изменения из репозитория, пока индекс чист
+          git pull --rebase origin main || true
+          
+          # 2. Добавляем скачанный файл в индекс
           git add domains-export.txt
           
-          # Проверяем, есть ли изменения, чтобы не плодить пустые коммиты и ошибки
+          # 3. Проверяем, изменился ли файл. Если да — коммитим и пушим
           if ! git diff --cached --quiet; then
-            git commit -m "auto-update domains list"
-            git pull --rebase origin main || true
+            git commit -m "Auto-update domains list"
             git push
           else
-            echo "No changes detected"
+            echo "No changes in domains list. Skipping commit."
           fi
